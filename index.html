@@ -36,13 +36,12 @@
 		<p>Type in an equation in \(LaTeX\) format. If your syntax is correct, it should show up accordingly on the right. Use the 'Save SVG' button to save the currently rendered equation as an svg file.</p>
 		<br>
 		<div id="gooby" class="row">
-			<div id="daffy" class="col-xs-6 col-md-6">
-				<input type="text" id="inputty" class="form-control" placeholder="LaTeX eq.">
-				<button id="saveb" class="btn btn-primary pull-right" onclick="saveIt()">Save SVG</button>
+			<div style="margin-bottom: 10px;">
+				<textarea type="text" id="inputty" style="resize: none;" class="form-control" placeholder="LaTeX eq."></textarea>
 			</div>
-			<div class="col-xs-6 col-md-6">
-				<div id="putty"class="well"></div>
-			</div>
+			<div style="margin-bottom: 10px;" id="putty"class="well"></div>
+			<button id="saveb" class="btn btn-primary pull-right" onclick="saveIt()">Save as SVG</button>
+			
 		</div>
 		<footer class="row">
 			<div class="col-xs-6 col-md-6">
