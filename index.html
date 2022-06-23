@@ -28,12 +28,12 @@
 		<div class="page-header">
 			<h1>MathJax Viewer <small>Edit &amp; preview</small></h1>
 		</div>
-		<p>Type in an equation in \(LaTeX\) format and press the button (or press Enter). If your syntax is correct, it should show up accordingly on the right.</p>
+		<p>Type in an equation in \(LaTeX\) format. If your syntax is correct, it should show up accordingly on the right. Use the 'Save SVG' button to save the currently rendered equation as an svg file.</p>
 		<br>
 		<div id="gooby" class="row">
 			<div id="daffy" class="col-xs-6 col-md-6">
 				<input type="text" id="inputty" class="form-control" placeholder="LaTeX eq.">
-				<button id="butty" class="btn btn-primary pull-right">Go</button>
+				<button id="saveb" class="btn btn-primary pull-right" onclick="saveIt()">Save SVG</button>
 			</div>
 			<div class="col-xs-6 col-md-6">
 				<div id="putty"class="well"></div>
@@ -64,14 +64,48 @@
 					MathJax.Hub.Typeset();
 				}
 
-				$("#butty").click(doIt);
+				saveIt = function(){
+					// Retrieve SVG dom element
+					var svg = document.getElementById("putty").children [1].children [0];
 
-				$("#inputty").keypress(function(e){
-					if (e.which == 13) {
-						doIt();
-						return false;
-					}});
+					// Serialize dom element to pure SVG
+					var serializer = new XMLSerializer();
+					var source = serializer.serializeToString(svg);
 
+					//convert svg source to URI data scheme.
+					var url = encodeURIComponent(source);
+
+					download = function downloadFile(file) {
+						// Create a link and set the URL using `createObjectURL`
+						const link = document.createElement("a");
+						link.style.display = "none";
+						link.href = URL.createObjectURL(file);
+						link.download = file.name;
+
+						// It needs to be added to the DOM so it can be clicked
+						document.body.appendChild(link);
+						link.click();
+
+						// To make this work on Firefox we need to wait
+						// a little while before removing it.
+						setTimeout(() => {
+							URL.revokeObjectURL(link.href);
+							link.parentNode.removeChild(link);
+						}, 0);
+					}
+
+					// Dynamically create a File
+					const myFile = new File([ source ], "equation.svg");
+
+					// Download it using our function
+					download(myFile);
+				}
+
+				$("#inputty").on("keyup", function(e){
+					doIt();
+				});
+
+				doIt();
 			});
 		</script>
 		</footer>
