@@ -4,12 +4,17 @@
 	<title>MathJax Viewer</title>
 	<script type="text/x-mathjax-config">
 	MathJax.Hub.Config({
-	tex2jax: { inlineMath: [["$","$"],["\\(","\\)"]] },
-	"HTML-CSS": {
-	  linebreaks: { automatic: true, width: "container" }          
-	}              
+	tex2svg: { inlineMath: [["$","$"],["\\(","\\)"]] },
+	"CommonHTML": {
+	  linebreaks: { automatic: true }          
+	}   
+	});
+
+	MathJax.Hub.Register.StartupHook("End Jax",function () {
+		return MathJax.Hub.setRenderer("CommonHTML");
 	});
 	</script>
+	<script src="dom-to-image.min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 	<!-- Latest compiled and minified CSS -->
@@ -68,37 +73,22 @@
 					// Retrieve SVG dom element
 					var svg = document.getElementById("putty").children [1].children [0];
 
-					// Serialize dom element to pure SVG
-					var serializer = new XMLSerializer();
-					var source = serializer.serializeToString(svg);
+					domtoimage.toSvg(svg)
+					.then(function (dataUrl) {
+						var img = new Image();
+						img.src = dataUrl;
 
-					//convert svg source to URI data scheme.
-					var url = encodeURIComponent(source);
+						var link = document.createElement("a");
 
-					download = function downloadFile(file) {
-						// Create a link and set the URL using `createObjectURL`
-						const link = document.createElement("a");
-						link.style.display = "none";
-						link.href = URL.createObjectURL(file);
-						link.download = file.name;
+						document.body.appendChild(link); // for Firefox
 
-						// It needs to be added to the DOM so it can be clicked
-						document.body.appendChild(link);
+						link.setAttribute("href", img.src);
+						link.setAttribute("download", "result.svg");
 						link.click();
-
-						// To make this work on Firefox we need to wait
-						// a little while before removing it.
-						setTimeout(() => {
-							URL.revokeObjectURL(link.href);
-							link.parentNode.removeChild(link);
-						}, 0);
-					}
-
-					// Dynamically create a File
-					const myFile = new File([ source ], "equation.svg");
-
-					// Download it using our function
-					download(myFile);
+					})
+					.catch(function (error) {
+						console.error('Something went wrong!', error);
+					});
 				}
 
 				$("#inputty").on("keyup", function(e){
